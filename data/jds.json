@@ -1,0 +1,60 @@
+[
+  {
+    "id": "seedbdmgr001",
+    "title": "Business Development Manager",
+    "department": "Business Development",
+    "location": "",
+    "employmentType": "Full-time",
+    "summary": "Drive growth by identifying new business opportunities, managing client relationships, and shaping market strategy for the company's software solutions.",
+    "status": "published",
+    "sections": [
+      {
+        "id": "s1",
+        "heading": "Business Development",
+        "items": [
+          "Identify and pursue new business opportunities through market research, networking, and lead generation activities.",
+          "Develop and implement strategic plans to expand the company's client base and market presence.",
+          "Create compelling proposals, presentations, and pitches for potential clients."
+        ]
+      },
+      {
+        "id": "s2",
+        "heading": "Client Relationship Management",
+        "items": [
+          "Build and maintain strong relationships with existing clients, understanding their needs and providing exceptional service.",
+          "Act as a primary point of contact for clients, addressing inquiries, resolving issues, and ensuring client satisfaction.",
+          "Regularly communicate with clients to gather feedback, identify opportunities for upselling or cross-selling, and strengthen partnerships."
+        ]
+      },
+      {
+        "id": "s3",
+        "heading": "Market Analysis and Strategy",
+        "items": [
+          "Conduct thorough market analysis to identify industry trends, competitive landscape, and potential business opportunities.",
+          "Develop and implement strategic plans to capitalize on market trends, optimize revenue streams, and achieve growth targets.",
+          "Monitor and evaluate the effectiveness of business development strategies, making adjustments as needed to ensure success."
+        ]
+      },
+      {
+        "id": "s4",
+        "heading": "Content Development",
+        "items": [
+          "Collaborate with internal and external stakeholders to create high-quality content that supports business development efforts, including blog posts, case studies, whitepapers, and presentations.",
+          "Provide input on content strategy to ensure alignment with business development goals and target audience needs.",
+          "Assist in the development of sales and marketing materials that effectively communicate the value proposition of the company's software solutions."
+        ]
+      },
+      {
+        "id": "s5",
+        "heading": "Collaboration and Teamwork",
+        "items": [
+          "Collaborate with internal teams to align business development efforts with company objectives.",
+          "Provide leadership, guidance, and support to team members involved in business development activities.",
+          "Foster a culture of teamwork, collaboration, and continuous improvement within the business development function."
+        ]
+      }
+    ],
+    "createdAt": "2026-10-10T00:00:00.000Z",
+    "updatedAt": "2026-10-10T00:00:00.000Z"
+  }
+]

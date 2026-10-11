@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JD Manager</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">JD</span>
+      <div>
+        <h1>JD Manager</h1>
+        <p class="muted">Create and manage job descriptions</p>
+      </div>
+    </div>
+    <button id="newBtn" class="btn btn-primary">+ New Job Description</button>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <input id="search" class="search" type="search" placeholder="Search by title or department…" />
+      <div class="filters" id="filters">
+        <button class="chip active" data-status="all">All</button>
+        <button class="chip" data-status="draft">Drafts</button>
+        <button class="chip" data-status="published">Published</button>
+      </div>
+      <div id="list" class="list"></div>
+      <p id="emptyList" class="empty hidden">No job descriptions match.</p>
+    </aside>
+
+    <section id="viewer" class="viewer">
+      <div class="placeholder">
+        <h2>Select a job description</h2>
+        <p class="muted">Choose one from the list, or create a new one to get started.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Editor dialog -->
+  <dialog id="editor" class="editor">
+    <form id="editorForm" method="dialog">
+      <div class="editor-head">
+        <h2 id="editorTitle">New Job Description</h2>
+        <button type="button" id="closeEditor" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+
+      <div class="grid">
+        <label>Job title<input name="title" required placeholder="e.g. Business Development Manager" /></label>
+        <label>Department<input name="department" placeholder="e.g. Sales" /></label>
+        <label>Location<input name="location" placeholder="e.g. Colombo" /></label>
+        <label>Employment type
+          <select name="employmentType">
+            <option value="">—</option>
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Contract</option>
+            <option>Internship</option>
+          </select>
+        </label>
+      </div>
+
+      <label>Summary / purpose
+        <textarea name="summary" rows="2" placeholder="Short description of the role"></textarea>
+      </label>
+
+      <label>Status
+        <select name="status">
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+      </label>
+
+      <div class="sections-head">
+        <h3>Sections &amp; responsibilities</h3>
+        <button type="button" id="addSection" class="btn btn-ghost">+ Add section</button>
+      </div>
+      <div id="sections"></div>
+
+      <div class="editor-actions">
+        <button type="button" id="deleteBtn" class="btn btn-danger hidden">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" id="cancelBtn" class="btn btn-ghost">Cancel</button>
+        <button type="submit" id="saveBtn" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="sectionTemplate">
+    <div class="section-row">
+      <div class="section-row-head">
+        <input class="section-heading" placeholder="Section heading (e.g. Business Development)" />
+        <button type="button" class="icon-btn remove-section" aria-label="Remove section">✕</button>
+      </div>
+      <div class="items"></div>
+      <button type="button" class="btn btn-ghost add-item">+ Add bullet</button>
+    </div>
+  </template>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
