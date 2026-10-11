@@ -19,14 +19,23 @@ Hosted at **https://jd.jihltd.com** (isolated subdomain, HTTPS).
   `/var/www/letsencrypt`), auto-renewing.
 - **DNS:** Cloudflare `A jd.jihltd.com -> 5.189.163.58`, DNS-only (grey cloud).
 
-### Redeploy
+### Redeploy (automated)
+
+Pushing a `v*` tag runs the **CI/CD** workflow (see `BUILD-SPEC.md` and
+`.github/workflows/ci-cd.yml`): it tests the app, then redeploys it and smoke
+tests the public URL.
+
+To deploy by hand, the same code path the pipeline uses is available locally:
 
 ```bash
-# from the workstation
-tar -czf .deploy/jd-manager.tar.gz --exclude='./.deploy' -C . .
-# upload + extract on server, then:
-pm2 restart jd-manager --update-env
+python3 deploy/wire-deploy.py pack             # build dist/jd-manager.tar.gz
+DEPLOY_HOST=5.189.163.58 DEPLOY_USER=root \
+DEPLOY_PASSWORD=... python3 deploy/wire-deploy.py remote-deploy
 ```
+
+`remote-deploy` backs up the current release, extracts the new one, restarts
+PM2, health-checks `127.0.0.1:3099`, and **rolls back automatically** if the
+check fails.
 
 ### Local
 
@@ -51,6 +60,18 @@ To use a different port: `$env:PORT=4000; node server.js`
 
 Stored as plain JSON in `data/jds.json`. Edit that file directly if you prefer,
 or delete it to start empty (it is recreated automatically).
+
+## Tests
+
+Zero-dependency, using Node's built-in test runner (Node ≥ 20):
+
+```bash
+npm test        # node --test   (10 API + static tests)
+npm run check   # syntax check
+```
+
+The tests boot the real server on an ephemeral port against a temporary data
+file and exercise the HTTP API end to end.
 
 ## API
 

@@ -4,6 +4,9 @@ node_modules/
 # Deploy tooling, SSH keys and virtualenv (contains secrets)
 .deploy/
 
+# Build output
+dist/
+
 # Logs
 *.log
 npm-debug.log*
@@ -18,3 +21,7 @@ desktop.ini
 
 # Runtime data snapshots
 *.bak
+
+# Python bytecode
+__pycache__/
+*.pyc

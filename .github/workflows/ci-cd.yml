@@ -1,0 +1,104 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+# Only one deploy at a time; a newer tag supersedes an in-flight one.
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Syntax check
+        run: npm run check
+      - name: Unit + API tests
+        run: npm test
+
+  deploy:
+    name: Deploy to production
+    needs: ci
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    # Add required reviewers to this environment in repo settings to gate
+    # production deploys behind a manual approval.
+    environment: production
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+      DOMAIN: ${{ vars.DEPLOY_DOMAIN || 'jd.jihltd.com' }}
+      IPV4: ${{ vars.DEPLOY_IPV4 }}
+      IPV6: ${{ vars.DEPLOY_IPV6 }}
+      APP_DIR: /srv/jd-manager
+      APP_PORT: "3099"
+      APP_NAME: jd-manager
+      HEALTH_URL: ${{ vars.DEPLOY_HEALTH_URL || 'https://jd.jihltd.com/' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Secrets cannot be referenced in a job-level `if`, so decide here.
+      - name: Check deploy configuration
+        id: cfg
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          PASS: ${{ secrets.DEPLOY_PASSWORD }}
+        run: |
+          if [ -n "$HOST" ] && [ -n "$PASS" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::DEPLOY_HOST/DEPLOY_PASSWORD secrets are not set - skipping deployment."
+          fi
+
+      - name: Install sshpass
+        if: steps.cfg.outputs.ready == 'true'
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Build release tarball
+        if: steps.cfg.outputs.ready == 'true'
+        run: EXPECTED_VERSION="${GITHUB_REF_NAME#v}" python3 deploy/wire-deploy.py pack
+
+      - name: Verify SSH transport
+        if: steps.cfg.outputs.ready == 'true'
+        run: python3 deploy/wire-deploy.py check-ssh
+
+      - name: Deploy (with automatic rollback on failure)
+        if: steps.cfg.outputs.ready == 'true'
+        run: python3 deploy/wire-deploy.py remote-deploy
+
+      - name: Smoke test public URL
+        if: steps.cfg.outputs.ready == 'true'
+        run: python3 deploy/wire-deploy.py smoke
+
+  release:
+    name: Publish GitHub Release
+    needs: ci
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "JD Manager ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            --verify-tag

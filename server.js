@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
 const PUBLIC_DIR = path.join(__dirname, "public");
 const DATA_DIR = path.join(__dirname, "data");
-const DATA_FILE = path.join(DATA_DIR, "jds.json");
+const DATA_FILE = process.env.DATA_FILE || path.join(DATA_DIR, "jds.json");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -169,7 +169,16 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-ensureStore();
-server.listen(PORT, HOST, () => {
-  console.log(`JD Manager running at http://${HOST}:${PORT}`);
-});
+function createServer() {
+  return server;
+}
+
+module.exports = { createServer, normalise, readAll, writeAll, ensureStore };
+
+if (require.main === module) {
+  ensureStore();
+  server.listen(PORT, HOST, () => {
+    const addr = server.address();
+    console.log(`JD Manager running at http://${HOST}:${addr.port}`);
+  });
+}
